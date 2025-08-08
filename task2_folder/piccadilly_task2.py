@@ -36,9 +36,18 @@ edges = [
     ("Baker Street", "St. John's Wood", 1.2),
     # Interchange connections
     ("Green Park", "Oxford Circus", 0.6), ("Bond Street", "Oxford Circus", 0.5),
-    ("Green Park", "Westminster", 0.9), ("Bond Street", "Baker Street", 0.4)
+    ("Green Park", "Westminster", 0.9), ("Bond Street", "Baker Street", 0.4),
+    ("King's Cross St. Pancras", "Holborn", 1.5),  # Nối Northern với Piccadilly
+    ("Waterloo", "Oxford Circus", 1.8)  # Nối Jubilee với Central
 ]
 G.add_weighted_edges_from(edges)
+
+# Kiểm tra số lượng thành phần liên thông
+components = list(nx.connected_components(G))
+print(f"Số lượng thành phần liên thông: {len(components)}")
+print("Các thành phần liên thông:")
+for i, component in enumerate(components, 1):
+    print(f"Thành phần {i}: {component}")
 
 # Assign colors to each line
 colors = {
@@ -52,9 +61,35 @@ edge_colors = [colors["Piccadilly"] if e[0] in stations["Piccadilly"] and e[1] i
                colors["Northern"] if e[0] in stations["Northern"] and e[1] in stations["Northern"] else
                colors["Jubilee"] for e in G.edges()]
 
+# Layout for visualization with real coordinates
+pos = {
+    "Hyde Park Corner": (51.5027, -0.1527),
+    "Green Park": (51.5067, -0.1428),
+    "Piccadilly Circus": (51.5098, -0.1342),
+    "Leicester Square": (51.5113, -0.1281),
+    "Covent Garden": (51.5129, -0.1243),
+    "Holborn": (51.5174, -0.1200),
+    "Oxford Circus": (51.5151, -0.1415),
+    "Bond Street": (51.5142, -0.1494),
+    "Marble Arch": (51.5136, -0.1586),
+    "Lancaster Gate": (51.5119, -0.1756),
+    "Queensway": (51.5104, -0.1872),
+    "Notting Hill Gate": (51.5091, -0.1962),
+    "Camden Town": (51.5392, -0.1426),
+    "Euston": (51.5282, -0.1337),
+    "King's Cross St. Pancras": (51.5308, -0.1238),
+    "Angel": (51.5322, -0.1058),
+    "Old Street": (51.5263, -0.0873),
+    "Moorgate": (51.5186, -0.0881),
+    "Waterloo": (51.5036, -0.1133),
+    "Westminster": (51.5010, -0.1250),
+    "Baker Street": (51.5226, -0.1571),
+    "St. John's Wood": (51.5304, -0.1743)
+}
+
 # Draw graph
-pos = nx.spring_layout(G)  # Layout for visualization
-nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=500, font_size=10, font_weight='bold', edge_color=edge_colors)
+node_colors = ['red' if G.degree(node) == 1 else 'lightblue' for node in G.nodes()]
+nx.draw(G, pos, with_labels=True, node_color=node_colors, node_size=500, font_size=10, font_weight='bold', edge_color=edge_colors)
 edge_labels = nx.get_edge_attributes(G, 'weight')
 nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
